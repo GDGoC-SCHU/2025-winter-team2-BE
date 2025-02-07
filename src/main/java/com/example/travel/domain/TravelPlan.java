@@ -21,10 +21,12 @@ public class TravelPlan {
     private int totalBudget;  // 총 예산
     private int dayCount;     // 총 여행 기간(일)
 
+
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
 
     @OneToMany(mappedBy = "travelPlan", cascade = CascadeType.ALL)
     private List<TravelPlanDay> travelPlanDays;
+
 }
