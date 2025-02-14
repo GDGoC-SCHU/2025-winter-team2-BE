@@ -35,11 +35,7 @@ README.md 초안 (AI 파트 & Postman 테스트 포함)
 
 ## API 사용 방법
 
-<<<<<<< HEAD
 *   **Swagger UI**: `http://15.164.120.40:8080/swagger-ui/index.html` 
-=======
-*   **Swagger UI**: `http://localhost:8080/swagger-ui/index.html` 
->>>>>>> a67bdd602827007b7a79f84dc8f43a3c9f58128a
 *   **Postman**: 아래 Postman 테스트 가이드 참고
 
 ## AI 파트 상세 설명
@@ -87,11 +83,7 @@ README.md 초안 (AI 파트 & Postman 테스트 포함)
 2.  **API Endpoint 확인**: Swagger UI 또는 소스 코드를 통해 테스트할 API endpoint를 확인합니다.
 3.  **Request 작성**: Postman에서 새로운 Request를 생성하고, 다음과 같이 설정합니다.
     *   **Method**: API endpoint에 맞는 HTTP Method (GET, POST, PUT, DELETE 등)를 선택합니다.
-<<<<<<< HEAD
     *   **URL**: API endpoint URL을 입력합니다. (ex. `http://15.164.120.40:8080/api/users/login`)
-=======
-    *   **URL**: API endpoint URL을 입력합니다. (ex. `http://localhost:8080/api/users/login`)
->>>>>>> a67bdd602827007b7a79f84dc8f43a3c9f58128a
     *   **Headers**: 필요한 Header를 추가합니다. (ex. `Content-Type: application/json`, `Authorization: Bearer [JWT 토큰]`)
     *   **Body**: POST, PUT 요청의 경우, JSON 형태의 Request Body를 입력합니다.
 4.  **Request 전송**: Send 버튼을 클릭하여 Request를 전송합니다.
@@ -101,11 +93,7 @@ README.md 초안 (AI 파트 & Postman 테스트 포함)
 
 *   **회원 가입 API (`/api/users/register`)**
     *   Method: POST
-<<<<<<< HEAD
     *   URL: `http://15.164.120.40:8080/api/users/register`
-=======
-    *   URL: `http://localhost:8080/api/users/register`
->>>>>>> a67bdd602827007b7a79f84dc8f43a3c9f58128a
     *   Headers: `Content-Type: application/json`
     *   Body:
         ```
@@ -117,11 +105,7 @@ README.md 초안 (AI 파트 & Postman 테스트 포함)
         ```
 *   **로그인 API (`/api/users/login`)**
     *   Method: POST
-<<<<<<< HEAD
     *   URL: `http://15.164.120.40:8080/api/users/login`
-=======
-    *   URL: `http://localhost:8080/api/users/login`
->>>>>>> a67bdd602827007b7a79f84dc8f43a3c9f58128a
     *   Headers: `Content-Type: application/json`
     *   Body:
         ```
@@ -132,11 +116,7 @@ README.md 초안 (AI 파트 & Postman 테스트 포함)
         ```
 *   **AI 추천 API (`/api/ai/recommend`)**
     *   Method: POST
-<<<<<<< HEAD
     *   URL: `http://15.164.120.40:8080/api/ai/recommend`
-=======
-    *   URL: `http://localhost:8080/api/ai/recommend`
->>>>>>> a67bdd602827007b7a79f84dc8f43a3c9f58128a
     *   Headers: `Content-Type: application/json`
     *   Body:
         ```
