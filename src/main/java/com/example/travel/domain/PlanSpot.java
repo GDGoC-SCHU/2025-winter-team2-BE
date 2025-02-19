@@ -1,5 +1,6 @@
 package com.example.travel.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -12,16 +13,12 @@ public class PlanSpot {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String spotName;      // 장소 이름
-    private String spotAddress;   // 장소 주소
-    private String spotLink;      // 장소 링크
-    private int estimatedCost;    // 예상 비용
-    private double distance;      // 거리
-    private int duration;         // 체류 시간 (분 단위)
-    private int spotOrder;        // 방문 순서
+    private String name;       // 장소 이름
+    private String category;   // 장소 카테고리 (힐링, 액티비티 등)
+    private String location;   // 네이버 지도 검색 URL
 
     @ManyToOne
     @JoinColumn(name = "travel_plan_day_id")
+    @JsonIgnore
     private TravelPlanDay travelPlanDay;
 }
-

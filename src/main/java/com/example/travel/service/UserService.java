@@ -6,6 +6,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.Optional;
 
 @Service
 public class UserService {
@@ -27,9 +28,9 @@ public class UserService {
         }
         User user = new User();
         user.setEmail(email);
-        user.setPassword(passwordEncoder.encode(password)); // ✅ 비밀번호 암호화
-        user.setBirthDate(birthDate); // ✅ 생년월일 저장
-        user.setGender(gender); // ✅ 성별 저장
+        user.setPassword(passwordEncoder.encode(password)); // 비밀번호 암호화
+        user.setBirthDate(birthDate); // 생년월일 저장
+        user.setGender(gender); // 성별 저장
 
         userRepository.save(user);
     }
@@ -43,11 +44,23 @@ public class UserService {
             throw new RuntimeException("Invalid email or password");
         }
 
-        // ✅ 올바른 메서드 사용 (generateToken → generateAccessToken)
+        // 올바른 메서드 사용 (generateToken → generateAccessToken)
         String accessToken = jwtUtil.generateAccessToken(email);
         String refreshToken = jwtUtil.generateRefreshToken(email);
 
         return "Access Token: " + accessToken + ", Refresh Token: " + refreshToken;
+    }
+
+    public User authenticate(String email, String password) {
+        Optional<User> optionalUser = userRepository.findByEmail(email);
+
+        if (optionalUser.isPresent()) {
+            User user = optionalUser.get();
+            if (passwordEncoder.matches(password, user.getPassword())) { // 비밀번호 검증
+                return user;
+            }
+        }
+        return null; // 인증 실패 시 null 반환
     }
 
     // 소셜 로그인
@@ -60,7 +73,7 @@ public class UserService {
                     return userRepository.save(newUser);
                 });
 
-        return jwtUtil.generateAccessToken(user.getEmail()); // ✅ 수정됨
+        return jwtUtil.generateAccessToken(user.getEmail()); // 수정됨
     }
 
     public User getUserByEmail(String email) {

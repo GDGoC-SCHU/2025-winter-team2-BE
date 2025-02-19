@@ -1,5 +1,6 @@
 package com.example.travel.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -22,14 +23,15 @@ public class User {
 
     private String password;
     private String nickname;
-    private String socialType; // 소셜 로그인 타입 (e.g., "NAVER", "KAKAO")
-    private String socialId;   // 소셜 계정 ID
-    private String birthDate; // ✅ 생년월일 추가 (YYYY.MM.DD 형식)
-    private String gender; // ✅ 성별 추가 ("M" = 남성, "F" = 여성, "O" = 기타)
+    private String socialType; //
+    private String socialId;   //
+    private String birthDate; //
+    private String gender; //
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<TravelPlan> travelPlans;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<CommunityPost> communityPosts;
+//    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+//    private List<CommunityPost> communityPosts;
 }

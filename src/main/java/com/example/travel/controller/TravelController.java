@@ -2,84 +2,72 @@ package com.example.travel.controller;
 
 import com.example.travel.domain.PlanSpot;
 import com.example.travel.domain.TravelPlan;
+import com.example.travel.domain.User;
+import com.example.travel.dto.TravelPlanDto;
+import com.example.travel.repository.UserRepository;
 import com.example.travel.service.TravelService;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
-@RequestMapping("/api/travel")
+@RequestMapping("/api")
+@RequiredArgsConstructor
 public class TravelController {
-
     private final TravelService travelService;
+    private final UserRepository userRepository;
+    private final RestTemplate restTemplate = new RestTemplate();
+    private final String AI_API_URL = "http://localhost:8000/generate_itinerary"; // FastAPI 서버 URL
 
+    @PostMapping("/recommend")
+    public ResponseEntity<?> generateTravelPlan(@RequestBody TravelPlanDto.TravelPlanRequest request,
+                                                @AuthenticationPrincipal UserDetails userDetails) {
+        if (request.getLocation() == null || request.getDays() <= 0 || request.getTheme() == null) {
+            return ResponseEntity.badRequest().body("잘못된 요청입니다. location, days, theme 값이 필요합니다.");
+        }
 
-    public TravelController(TravelService travelService) {
-        this.travelService = travelService;
-    }
-    // 사용자 여행 계획 저장
-    @PostMapping("/plans")
-    public ResponseEntity<String> saveTravelPlan(@RequestBody TravelPlan travelPlanRequest) {
-        travelService.saveTravelPlan(travelPlanRequest);
-        return ResponseEntity.ok("Travel plan saved successfully.");
-    }
+        // 현재 로그인한 사용자 정보 가져오기
+        User user = userRepository.findByEmail(userDetails.getUsername())
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
-    // 사용자 여행 계획 조회 (모든 계획)
-    @GetMapping("/plans")
-    public ResponseEntity<List<TravelPlan>> getAllTravelPlans() {
-        return ResponseEntity.ok(travelService.getAllTravelPlans());
-    }
+        String aiRequestUrl = AI_API_URL + "?location=" + request.getLocation() +
+                "&days=" + request.getDays() +
+                "&theme=" + request.getTheme();
 
-    // 특정 여행 계획 조회
-    @GetMapping("/plans/{planId}")
-    public ResponseEntity<TravelPlan> getTravelPlan(@PathVariable Long planId) {
-        return ResponseEntity.ok(travelService.getTravelPlan(planId));
-    }
+        ResponseEntity<Map> aiResponse = restTemplate.getForEntity(aiRequestUrl, Map.class);
+        if (aiResponse.getBody() == null) {
+            return ResponseEntity.badRequest().body("AI 응답이 없습니다.");
+        }
 
-    // 여행 계획 삭제
-    @DeleteMapping("/plans/{planId}")
-    public ResponseEntity<String> deleteTravelPlan(@PathVariable Long planId) {
-        travelService.deleteTravelPlan(planId);
-        return ResponseEntity.ok("Travel plan deleted successfully.");
-    }
+        TravelPlan travelPlan = travelService.saveTravelPlan(aiResponse.getBody(), user.getId());
 
-    // 장소 저장
-    @PostMapping("/spots")
-    public ResponseEntity<String> savePlanSpot(@RequestParam Long travelPlanDayId, @RequestBody PlanSpot request) {
-        travelService.savePlanSpot(travelPlanDayId, request);
-        return ResponseEntity.ok("Spot saved successfully.");
+        return ResponseEntity.status(HttpStatus.CREATED).body(Map.of(
+                "message", "여행 일정이 생성되었습니다.",
+                "travelPlanId", travelPlan.getId(),
+                "redirectUrl", "/plans/" + user.getId()
+        ));
     }
 
-    // 특정 날짜의 장소 조회
-    @GetMapping("/spots/{travelDayId}")
-    public ResponseEntity<List<PlanSpot>> getPlanSpots(@PathVariable Long travelDayId) {
-        return ResponseEntity.ok(travelService.getPlanSpots(travelDayId));
+
+    @GetMapping("/plans/{userId}")
+    public ResponseEntity<?> getLatestUserTravelPlan(@PathVariable Long userId) {
+        TravelPlan latestPlan = travelService.getLatestTravelPlanByUser(userId);
+        if (latestPlan == null) {
+            return ResponseEntity.status(404).body("해당 사용자의 최근 생성된 여행 일정이 없습니다.");
+        }
+        return ResponseEntity.ok(latestPlan);
     }
 
-    @PostMapping("/plans/{planId}/recommendations")
-    public ResponseEntity<String> saveRecommendations(
-            @PathVariable Long planId,
-            @RequestBody List<PlanSpot> recommendations) {
-        travelService.saveRecommendations(planId, recommendations);
-        return ResponseEntity.ok("Recommendations saved successfully.");
-    }
-
-    @Getter
-    @Setter
-    public class PlanSpotDTO {
-        private String spotName;
-        private String spotAddress;
-        private String spotLink;
-        private int estimatedCost;
-        private double distance;
-        private int duration;
-        private int spotOrder;
-    }
 
 
 }
-
 
