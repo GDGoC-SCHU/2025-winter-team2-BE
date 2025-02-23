@@ -13,7 +13,6 @@ README.md 초안 (AI 파트 & Postman 테스트 포함)
 *   **AI 기반 장소 추천**: 입력된 정보를 바탕으로 AI 서버에 요청하여 여행 계획에 맞는 장소를 추천받습니다.
 *   **추천 경로 및 예상 소요 시간 안내**: 추천된 장소들을 기반으로 최적의 이동 경로와 예상 소요 시간을 제공합니다. (현재 기능 구현 중, AI 파트 상세 내용 참고)
 *   **사용자 인증 및 권한 관리**: JWT (JSON Web Token)를 사용하여 사용자 인증 및 권한 관리를 수행합니다.
-*   **Swagger UI**: Swagger UI를 통해 API endpoint들을 시각적으로 확인하고 테스트할 수 있습니다.
 *   **Postman**: Postman을 사용하여 API endpoint들을 테스트할 수 있습니다.
 
 ## 기술 스택
@@ -21,7 +20,7 @@ README.md 초안 (AI 파트 & Postman 테스트 포함)
 *   **Backend**: Spring Boot
 *   **Database**: MySQL (여행 계획, 장소 정보, USER 정보 저장), Redis (JWT Refresh Token 관리)
 *   **API**: Naver Maps API (구현 예정), Naver Search API (구현 예정)
-*   **AI**: (별도의 AI 서버 연동)
+*   **AI**: (BE와 AI 서버 연동)
 *   **Security**: Spring Security, JWT
 
 
@@ -98,9 +97,11 @@ README.md 초안 (AI 파트 & Postman 테스트 포함)
     *   Body:
         ```
         {
-            "email": "test@example.com",
+            "email": "user@example.com",
             "password": "password",
-            "nickname": "testuser"
+            "confirmPassword": "password",
+            "birthYear": "1990",
+            "gender": "male"
         }
         ```
 *   **로그인 API (`/api/users/login`)**
@@ -114,6 +115,30 @@ README.md 초안 (AI 파트 & Postman 테스트 포함)
             "password": "password"
         }
         ```
+*   **프로필 정보를 조회 API (`/api/users/profile`)**
+    *   Method: POST
+    *   URL: `http://15.164.120.40:8080/api/users/profile`
+    *   Headers:
+        ```        
+            'Authorization: Bearer {JWT_ACCESS_TOKEN}'
+            `Content-Type: application/json`
+        ```  
+    *   Body:
+        ```
+        {
+            "email": "test@example.com",
+            "password": "password"
+        }
+        ```
+    *   응답:
+        ```
+        200 OK
+         {
+            "email": "user@example.com",
+            "birthDate": "1990-01-01",
+            "gender": "male"
+         }
+        ```
 *   **AI 추천 API (`/api/ai/recommend`)**
     *   Method: POST
     *   URL: `http://15.164.120.40:8080/api/ai/recommend`
@@ -122,16 +147,17 @@ README.md 초안 (AI 파트 & Postman 테스트 포함)
         ```
         {
             "location": "남원시",
-            "purpose": "가족 여행",
-            "category": "맛집",
             "dayCount": 2,
-            "totalBudget": 500000
+            "category": "맛집",       
+        }
+        ```
+        *   응답:
+        ```
+         201 Created
+        {
+             "message": "여행 일정이 생성되었습니다.",
+             "travelPlanId": 123,
+             "redirectUrl": "/plans/1"
         }
         ```
 
-## 향후 개선 사항
-
-*   사용자 피드백 반영 시스템 구축
-*   UI/UX 개선
-*   Naver Maps API 연동을 통한 경로 추천 기능 구현 (AI 파트 내용 참고)
-*   API 문서 자동 생성 (Swagger UI)
