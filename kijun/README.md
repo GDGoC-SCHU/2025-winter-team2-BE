@@ -45,6 +45,7 @@
 * **Uvicorn**: ASGI 서버 (FastAPI 구글 AI 애플리케이션 실행)
 * **MySQL**: 데이터베이스
 * **가상 환경 (venv)**: Python 프로젝트 의존성 관리
+* **genai: Google의 Gemini API를 사용하기 위한 Python SDK
 
 ## 환경 설정
 
