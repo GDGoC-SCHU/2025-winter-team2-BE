@@ -22,7 +22,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api")
 @RequiredArgsConstructor
-public class TravelController {
+public class TravelController { // =AIController
     private final TravelService travelService;
     private final UserRepository userRepository;
     private final RestTemplate restTemplate = new RestTemplate();

@@ -47,17 +47,9 @@ public class UserController {
     // 로그인
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request) {
-        User user = userService.authenticate(request.getEmail(), request.getPassword()); // ✅ 인증 확인
-        if (user == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
-        }
-
-        String accessToken = jwtUtil.generateAccessToken(user.getEmail()); // ✅ JWT 생성
-        String refreshToken = jwtUtil.generateRefreshToken(user.getEmail()); // ✅ RefreshToken도 생성
-
-        // ✅ "Bearer "를 붙여서 반환
-        return ResponseEntity.ok(LoginResponse.of(accessToken, refreshToken));
+        return ResponseEntity.ok(userService.login(request.getEmail(), request.getPassword()));
     }
+
 
 
     // 소셜 로그인
@@ -77,25 +69,6 @@ public class UserController {
         // 보통 JWT는 서버에서 직접 무효화할 수 없으므로, 클라이언트가 삭제하도록 응답 반환
         return ResponseEntity.ok("Logged out successfully. Please delete your token.");
     }
-
-    //리프레시 토큰 발급
-//    @PostMapping("/refresh-token")
-//    public ResponseEntity<String> refreshToken(@RequestHeader("Authorization") String refreshToken) {
-//        if (refreshToken == null || !refreshToken.startsWith("Bearer ")) {
-//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid refresh token format");
-//        }
-//
-//        refreshToken = refreshToken.substring(7); // "Bearer " 제거
-//
-//        if (!jwtUtil.validateToken(refreshToken)) {
-//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid refresh token");
-//        }
-//
-//        String email = jwtUtil.extractEmail(refreshToken);
-//        String newAccessToken = jwtUtil.generateAccessToken(email); // ✅ AccessToken만 새로 발급
-//
-//        return ResponseEntity.ok(newAccessToken);
-//    }
 
     // 마이 프로필 조회
     @GetMapping("/profile")

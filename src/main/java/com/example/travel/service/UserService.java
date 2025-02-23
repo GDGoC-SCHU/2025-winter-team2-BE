@@ -1,9 +1,12 @@
 package com.example.travel.service;
 
+import com.example.travel.controller.UserController;
 import com.example.travel.domain.User;
 import com.example.travel.repository.UserRepository;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
 import java.util.Optional;
@@ -36,54 +39,23 @@ public class UserService {
     }
 
     // 로그인 (AccessToken & RefreshToken 발급)
-    public String login(String email, String password) {
+    public UserController.LoginResponse login(String email, String password) {
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Invalid email or password"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid email or password"));
 
         if (!passwordEncoder.matches(password, user.getPassword())) {
-            throw new RuntimeException("Invalid email or password");
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid email or password");
         }
 
-        // 올바른 메서드 사용 (generateToken → generateAccessToken)
         String accessToken = jwtUtil.generateAccessToken(email);
         String refreshToken = jwtUtil.generateRefreshToken(email);
 
-        return "Access Token: " + accessToken + ", Refresh Token: " + refreshToken;
+        return new UserController.LoginResponse(accessToken, refreshToken);
     }
 
-    public User authenticate(String email, String password) {
-        Optional<User> optionalUser = userRepository.findByEmail(email);
-
-        if (optionalUser.isPresent()) {
-            User user = optionalUser.get();
-            if (passwordEncoder.matches(password, user.getPassword())) { // 비밀번호 검증
-                return user;
-            }
-        }
-        return null; // 인증 실패 시 null 반환
-    }
-
-    // 소셜 로그인
-    public String socialLogin(String provider, String accessToken) {
-        User user = userRepository.findByEmail(provider + "_user@example.com")
-                .orElseGet(() -> {
-                    User newUser = new User();
-                    newUser.setEmail(provider + "_user@example.com");
-                    newUser.setPassword(""); // 소셜 로그인은 비밀번호 없음
-                    return userRepository.save(newUser);
-                });
-
-        return jwtUtil.generateAccessToken(user.getEmail()); // 수정됨
-    }
 
     public User getUserByEmail(String email) {
         return userRepository.findByEmail(email)
                 .orElse(null);
-    }
-
-    // 토큰을 기반으로 사용자 조회
-    public User getUserByToken(String token) {
-        String email = jwtUtil.extractEmail(token);
-        return userRepository.findByEmail(email).orElse(null);
     }
 }

@@ -61,7 +61,7 @@ public class SecurityConfig {
                 )
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/users/login", "/api/users/register", "/error").permitAll()  // error 경로 추가
-                        .requestMatchers("/api/users/profile", "/api/recommend").authenticated()
+                        .requestMatchers("/api/users/profile", "/api/recommend", "/api/plans/{userId}").authenticated()
                         .requestMatchers(
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**",
